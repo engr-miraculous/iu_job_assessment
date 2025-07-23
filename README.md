@@ -28,7 +28,7 @@ This is a take-home technical assessment for the Flutter Developer position at *
 - Google Maps / Geolocator
 - Image Picker / Camera
 - Riverpod(a modern upgrade of Provider) for state management
-- Shared Preferences and local DB (for state and mock data presitence)
+- Shared Preferences and local DB (for state and mock data persitence)
 
 ---
 
