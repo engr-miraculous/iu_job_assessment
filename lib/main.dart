@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:iu_job_assessment/screens/report_list/report_screen.dart';
+import 'package:iu_job_assessment/screens/splash_screen.dart';
 import 'package:iu_job_assessment/utils/app_colors.dart';
 import 'package:iu_job_assessment/widgets/bottom_nav.dart';
 
@@ -16,7 +17,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Location-Based Reporting App',
       theme: _buildAppTheme(),
-      home: const MainScreen(),
+      home: const SplashScreen(),
       debugShowCheckedModeBanner: false,
     );
   }

@@ -1,3 +1,5 @@
+import 'package:iu_job_assessment/models/media_models.dart';
+
 /// Data model for Report entity
 class Report {
   final String id;
@@ -5,6 +7,7 @@ class Report {
   final String location;
   final String status;
   final String referenceNumber;
+  final List<MediaItem> media;
   final DateTime createdAt;
 
   const Report({
@@ -13,6 +16,7 @@ class Report {
     required this.location,
     required this.status,
     required this.referenceNumber,
+    this.media = const [],
     required this.createdAt,
   });
 
@@ -25,6 +29,11 @@ class Report {
       location: json['location'] as String,
       status: json['status'] as String,
       referenceNumber: json['referenceNumber'] as String,
+      media:
+          (json['media'] as List<dynamic>?)
+              ?.map((e) => MediaItem.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          [],
       createdAt: DateTime.parse(json['createdAt'] as String),
     );
   }
@@ -37,6 +46,7 @@ class Report {
       'location': location,
       'status': status,
       'referenceNumber': referenceNumber,
+      'media': media.map((e) => e.toJson()).toList(),
       'createdAt': createdAt.toIso8601String(),
     };
   }
@@ -48,6 +58,7 @@ class Report {
     String? location,
     String? status,
     String? referenceNumber,
+    List<MediaItem>? media,
     DateTime? createdAt,
   }) {
     return Report(
@@ -56,6 +67,7 @@ class Report {
       location: location ?? this.location,
       status: status ?? this.status,
       referenceNumber: referenceNumber ?? this.referenceNumber,
+      media: media ?? this.media,
       createdAt: createdAt ?? this.createdAt,
     );
   }
@@ -192,26 +204,26 @@ class ReportFormData {
   final ReportCategory? category;
   final String location;
   final String description;
-  final List<String> photos;
+  final List<MediaItem> media;
 
   const ReportFormData({
     this.category,
     this.location = '',
     this.description = '',
-    this.photos = const [],
+    this.media = const [],
   });
 
   ReportFormData copyWith({
     ReportCategory? category,
     String? location,
     String? description,
-    List<String>? photos,
+    List<MediaItem>? media,
   }) {
     return ReportFormData(
       category: category ?? this.category,
       location: location ?? this.location,
       description: description ?? this.description,
-      photos: photos ?? this.photos,
+      media: media ?? this.media,
     );
   }
 
@@ -222,12 +234,13 @@ class ReportFormData {
         description.trim().isEmpty) {
       return false;
     }
-
-    // If "Other" category is selected, ensure description provides details
     if (category!.requiresDescription && description.trim().length < 10) {
       return false;
     }
-
+    // Require at least one media for "Other"
+    if (category!.id == 'other' && media.isEmpty) {
+      return false;
+    }
     return true;
   }
 
@@ -239,8 +252,8 @@ class ReportFormData {
           category == other.category &&
           location == other.location &&
           description == other.description &&
-          photos.length == other.photos.length;
+          media.length == other.media.length;
 
   @override
-  int get hashCode => Object.hash(category, location, description, photos);
+  int get hashCode => Object.hash(category, location, description, media);
 }

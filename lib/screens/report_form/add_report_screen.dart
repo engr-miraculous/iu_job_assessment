@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:iu_job_assessment/models/location_model.dart';
+import 'package:iu_job_assessment/providers/media_provider.dart';
 import 'package:iu_job_assessment/providers/report_form_provider.dart';
 import 'package:iu_job_assessment/screens/report_form/location_field_button.dart';
+import 'package:iu_job_assessment/screens/report_form/media_widgets/report_form_photos_section.dart';
 import 'package:iu_job_assessment/screens/report_form/report_category_selector.dart';
 import 'package:iu_job_assessment/screens/report_form/rich_text_editor.dart';
 import 'package:iu_job_assessment/utils/app_colors.dart';
@@ -27,6 +29,7 @@ class _AddReportScreenState extends ConsumerState<AddReportScreen> {
     // Reset form when screen loads
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(reportFormProvider.notifier).resetForm();
+      ref.read(mediaProvider.notifier).clearAllMedia();
     });
   }
 
@@ -40,7 +43,7 @@ class _AddReportScreenState extends ConsumerState<AddReportScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.background,
       appBar: _buildAppBar(),
       body: _buildBody(),
     );
@@ -49,12 +52,14 @@ class _AddReportScreenState extends ConsumerState<AddReportScreen> {
   /// Build the app bar
   PreferredSizeWidget _buildAppBar() {
     return AppBar(
-      backgroundColor: Colors.white,
       elevation: 0,
-      leading: IconButton(
-        onPressed: () => Navigator.of(context).pop(),
-        icon: const Icon(Icons.close, color: AppColors.textPrimary),
-      ),
+      leading: const SizedBox.shrink(),
+      actions: [
+        IconButton(
+          onPressed: () => Navigator.of(context).pop(),
+          icon: const Icon(Icons.close, color: AppColors.textPrimary),
+        ),
+      ],
       title: const Text(
         'Add Report',
         style: TextStyle(
@@ -97,13 +102,15 @@ class _AddReportScreenState extends ConsumerState<AddReportScreen> {
                         decoration: BoxDecoration(
                           color: Colors.orange.shade50,
                           borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: Colors.orange.shade200),
+                          border: Border.all(
+                            color: AppColors.error.withAlpha(100),
+                          ),
                         ),
                         child: Row(
                           children: [
                             Icon(
                               Icons.info_outline,
-                              color: Colors.orange.shade600,
+                              color: AppColors.error,
                               size: 20,
                             ),
                             const SizedBox(width: 12),
@@ -111,7 +118,7 @@ class _AddReportScreenState extends ConsumerState<AddReportScreen> {
                               child: Text(
                                 "If answering 'Other', please provide details in the description.",
                                 style: TextStyle(
-                                  color: Colors.orange.shade700,
+                                  color: AppColors.error,
                                   fontSize: 13,
                                   fontWeight: FontWeight.w500,
                                 ),
@@ -174,25 +181,23 @@ class _AddReportScreenState extends ConsumerState<AddReportScreen> {
                   ),
                   const SizedBox(height: 24),
 
-                  // Photos field
-                  _buildSectionTitle('Photos (optional)'),
-                  const SizedBox(height: 8),
-                  TextFormField(
-                    controller: _photosController,
-                    onChanged: (value) {
-                      // Split by commas and update photos list
-                      final photos = value
-                          .split(',')
-                          .map((e) => e.trim())
-                          .where((e) => e.isNotEmpty)
-                          .toList();
+                  // Media field
+                  ReportFormPhotosSection(
+                    onPhotosChanged: (mediaItems) {
                       ref
                           .read(reportFormProvider.notifier)
-                          .updatePhotos(photos);
+                          .updateMedia(mediaItems);
                     },
-                    decoration: _buildInputDecoration('Value'),
-                    maxLines: 3,
-                    minLines: 1,
+                    validator: (mediaItems) {
+                      final isOtherSelected = ref.read(
+                        isOtherCategorySelectedProvider,
+                      );
+                      if (isOtherSelected &&
+                          (mediaItems == null || mediaItems.isEmpty)) {
+                        return 'Please add at least one photo or video for "Other" category';
+                      }
+                      return null;
+                    },
                   ),
                   const SizedBox(height: 32),
                 ],
@@ -219,43 +224,12 @@ class _AddReportScreenState extends ConsumerState<AddReportScreen> {
     );
   }
 
-  /// Build consistent input decoration
-  InputDecoration _buildInputDecoration(String hintText) {
-    return InputDecoration(
-      hintText: hintText,
-      hintStyle: TextStyle(color: AppColors.textSecondary, fontSize: 14),
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(8),
-        borderSide: BorderSide(color: Colors.grey.shade300),
-      ),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(8),
-        borderSide: BorderSide(color: Colors.grey.shade300),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(8),
-        borderSide: const BorderSide(color: AppColors.primary, width: 2),
-      ),
-      errorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(8),
-        borderSide: const BorderSide(color: Colors.red, width: 1),
-      ),
-      focusedErrorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(8),
-        borderSide: const BorderSide(color: Colors.red, width: 2),
-      ),
-      contentPadding: const EdgeInsets.all(16),
-      filled: true,
-      fillColor: Colors.grey.shade50,
-    );
-  }
-
   /// Build bottom action buttons
   Widget _buildBottomButtons() {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.background,
         boxShadow: [
           BoxShadow(
             color: Colors.grey.shade200,
@@ -271,17 +245,16 @@ class _AddReportScreenState extends ConsumerState<AddReportScreen> {
             child: OutlinedButton(
               onPressed: () => Navigator.of(context).pop(),
               style: OutlinedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 16),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(16),
                 ),
                 side: BorderSide(color: Colors.grey.shade300),
-                backgroundColor: Colors.white,
+                backgroundColor: AppColors.background,
               ),
               child: const Text(
                 'Cancel',
                 style: TextStyle(
-                  color: AppColors.textSecondary,
+                  color: AppColors.primary,
                   fontSize: 16,
                   fontWeight: FontWeight.w500,
                 ),
@@ -302,11 +275,10 @@ class _AddReportScreenState extends ConsumerState<AddReportScreen> {
                       ? _handleSubmit
                       : null,
                   style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 16),
                     backgroundColor: Colors.green.shade600,
                     disabledBackgroundColor: Colors.grey.shade300,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(24),
                     ),
                     elevation: 0,
                   ),
@@ -317,14 +289,14 @@ class _AddReportScreenState extends ConsumerState<AddReportScreen> {
                           child: CircularProgressIndicator(
                             strokeWidth: 2,
                             valueColor: AlwaysStoppedAnimation<Color>(
-                              Colors.white,
+                              AppColors.background,
                             ),
                           ),
                         )
                       : const Text(
                           'Submit report',
                           style: TextStyle(
-                            color: Colors.white,
+                            color: AppColors.background,
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
                           ),
@@ -340,12 +312,12 @@ class _AddReportScreenState extends ConsumerState<AddReportScreen> {
 
   /// Handle form submission
   Future<void> _handleSubmit() async {
-    // Validate location separately since it's not a TextFormField
+    // Validate location
     if (_selectedLocation == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Please select a location'),
-          backgroundColor: Colors.red,
+          backgroundColor: AppColors.error,
         ),
       );
       return;
@@ -362,7 +334,7 @@ class _AddReportScreenState extends ConsumerState<AddReportScreen> {
       // Submit the report
       final success = await ref
           .read(reportFormProvider.notifier)
-          .submitReport();
+          .submitReport(ref);
 
       if (success && mounted) {
         // Show success message
@@ -370,12 +342,15 @@ class _AddReportScreenState extends ConsumerState<AddReportScreen> {
           SnackBar(
             content: const Text(
               'Report submitted successfully!',
-              style: TextStyle(color: Colors.white),
+              style: TextStyle(color: AppColors.background),
             ),
             backgroundColor: Colors.green.shade600,
             duration: const Duration(seconds: 2),
           ),
         );
+
+        // Clear the media items from the media provider
+        ref.read(mediaProvider.notifier).clearAllMedia();
 
         // Navigate back to previous screen
         Navigator.of(context).pop();
@@ -385,9 +360,9 @@ class _AddReportScreenState extends ConsumerState<AddReportScreen> {
           const SnackBar(
             content: Text(
               'Failed to submit report. Please try again.',
-              style: TextStyle(color: Colors.white),
+              style: TextStyle(color: AppColors.background),
             ),
-            backgroundColor: Colors.red,
+            backgroundColor: AppColors.error,
             duration: Duration(seconds: 2),
           ),
         );
@@ -399,9 +374,9 @@ class _AddReportScreenState extends ConsumerState<AddReportScreen> {
           SnackBar(
             content: Text(
               'Error: ${e.toString()}',
-              style: const TextStyle(color: Colors.white),
+              style: const TextStyle(color: AppColors.background),
             ),
-            backgroundColor: Colors.red,
+            backgroundColor: AppColors.error,
             duration: const Duration(seconds: 3),
           ),
         );

@@ -101,6 +101,11 @@ class ReportsNotifier extends StateNotifier<ReportsState> {
     }
   }
 
+  void addReportFromForm(Report report) {
+    final updatedReports = [report, ...state.reports];
+    state = state.copyWith(reports: updatedReports);
+  }
+
   /// Generate mock reports for simulation
   List<Report> _generateMockReports(int startIndex, int count) {
     final List<String> reportTypes = [

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:iu_job_assessment/models/location_model.dart';
-import 'package:iu_job_assessment/screens/location_picker_screen.dart/location_picker_screen.dart';
+import 'package:iu_job_assessment/screens/location_picker/location_picker_screen.dart';
 import 'package:iu_job_assessment/utils/app_colors.dart';
 
 /// Location field button that opens location picker when tapped
@@ -35,10 +35,10 @@ class LocationFieldButton extends ConsumerWidget {
             width: double.infinity,
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Colors.grey.shade50,
+              color: AppColors.textSecondary.withAlpha(25),
               borderRadius: BorderRadius.circular(8),
               border: Border.all(
-                color: hasError ? Colors.red : Colors.grey.shade300,
+                color: hasError ? Colors.red : AppColors.textSecondary,
                 width: hasError ? 2 : 1,
               ),
             ),

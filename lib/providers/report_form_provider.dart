@@ -1,5 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:iu_job_assessment/models/media_models.dart';
 import 'package:iu_job_assessment/models/report_model.dart';
+import 'package:iu_job_assessment/providers/report_provider.dart';
 
 /// State notifier for managing report form data
 class ReportFormProvider extends StateNotifier<ReportFormData> {
@@ -20,23 +22,18 @@ class ReportFormProvider extends StateNotifier<ReportFormData> {
     state = state.copyWith(description: description);
   }
 
-  /// Update photos list
-  void updatePhotos(List<String> photos) {
-    state = state.copyWith(photos: photos);
+  void updateMedia(List<MediaItem> media) {
+    state = state.copyWith(media: media);
   }
 
-  /// Add a photo to the list
-  void addPhoto(String photoPath) {
-    final updatedPhotos = [...state.photos, photoPath];
-    state = state.copyWith(photos: updatedPhotos);
+  void addMediaItem(MediaItem item) {
+    final updated = [...state.media, item];
+    state = state.copyWith(media: updated);
   }
 
-  /// Remove a photo from the list
-  void removePhoto(String photoPath) {
-    final updatedPhotos = state.photos
-        .where((photo) => photo != photoPath)
-        .toList();
-    state = state.copyWith(photos: updatedPhotos);
+  void removeMediaItem(MediaItem item) {
+    final updated = state.media.where((m) => m != item).toList();
+    state = state.copyWith(media: updated);
   }
 
   /// Reset form to initial state
@@ -44,8 +41,8 @@ class ReportFormProvider extends StateNotifier<ReportFormData> {
     state = const ReportFormData();
   }
 
-  /// Submit the report (mock implementation)
-  Future<bool> submitReport() async {
+  /// Submit the report
+  Future<bool> submitReport(WidgetRef ref) async {
     if (!state.isValid) {
       return false;
     }
@@ -53,8 +50,20 @@ class ReportFormProvider extends StateNotifier<ReportFormData> {
     // Simulate API call delay
     await Future.delayed(const Duration(seconds: 1));
 
-    // Mock successful submission
-    // In a real app, this would make an API call
+    // Create a Report object with media
+    final report = Report(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      type: state.category?.name ?? 'Unknown',
+      location: state.location,
+      status: 'Pending',
+      referenceNumber: 'REF${DateTime.now().millisecondsSinceEpoch}',
+      createdAt: DateTime.now(),
+      media: state.media,
+    );
+
+    // Add to in-memory reports list
+    ref.read(reportsProvider.notifier).addReportFromForm(report);
+
     resetForm();
     return true;
   }

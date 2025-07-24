@@ -17,7 +17,7 @@ class LocationErrorWidget extends ConsumerWidget {
       decoration: BoxDecoration(
         color: AppColors.background,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.red.shade200),
+        border: Border.all(color: AppColors.error.withAlpha(100)),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,

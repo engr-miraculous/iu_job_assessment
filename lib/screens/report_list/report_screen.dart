@@ -58,7 +58,7 @@ class _ReportScreenState extends ConsumerState<ReportScreen> {
     return AppBar(
       leading: Padding(
         padding: const EdgeInsets.all(10),
-        child: SvgPicture.asset('assets/svgs/Logomark Custom.svg'),
+        child: SvgPicture.asset('assets/svgs/logo_40_x_40.svg'),
       ),
       title: const Text('My reports'),
       centerTitle: true,
@@ -307,6 +307,7 @@ class _ReportScreenState extends ConsumerState<ReportScreen> {
       children: [
         ElevatedButton.icon(
           style: ElevatedButton.styleFrom(
+            padding: const EdgeInsets.all(14),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(24),
             ),

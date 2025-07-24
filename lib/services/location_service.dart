@@ -249,4 +249,51 @@ class LocationService {
     final status = await Permission.location.status;
     return status.isGranted;
   }
+
+  // Get current position with proper error handling
+  Future<Position> getCurrentPosition() async {
+    // Check if location services are enabled
+    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      throw LocationServiceException('Location services are disabled');
+    }
+
+    // Check location permissions
+    LocationPermission permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        throw LocationServiceException('Location permissions are denied');
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      throw LocationServiceException(
+        'Location permissions are permanently denied, we cannot request permissions.',
+      );
+    }
+
+    // Get current position
+    try {
+      return await Geolocator.getCurrentPosition(
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.bestForNavigation,
+          distanceFilter: 0,
+          timeLimit: Duration(seconds: 10),
+        ),
+      );
+    } catch (e) {
+      throw LocationServiceException('Failed to get current location: $e');
+    }
+  }
+}
+
+// Custom exception for location service errors
+class LocationServiceException implements Exception {
+  final String message;
+
+  LocationServiceException(this.message);
+
+  @override
+  String toString() => 'LocationServiceException: $message';
 }

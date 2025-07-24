@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:iu_job_assessment/models/report_model.dart';
 import 'package:iu_job_assessment/providers/report_form_provider.dart';
 import 'package:iu_job_assessment/utils/app_colors.dart';
@@ -25,7 +26,7 @@ class ReportCategorySelector extends ConsumerWidget {
         ),
         const SizedBox(height: 16),
         Wrap(
-          spacing: 12,
+          spacing: 2,
           runSpacing: 12,
           children: ReportCategories.categories.map((category) {
             return _CategoryCard(
@@ -59,8 +60,8 @@ class _CategoryCard extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        width: 70,
-        height: 85,
+        width: 65,
+        height: 95,
         decoration: BoxDecoration(
           color: isSelected
               ? AppColors.primary.withAlpha(25)
@@ -81,11 +82,7 @@ class _CategoryCard extends StatelessWidget {
                 color: isSelected ? AppColors.primary : Colors.grey.shade400,
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: Icon(
-                _getCategoryIcon(category.id),
-                color: isSelected ? Colors.white : Colors.grey.shade600,
-                size: 20,
-              ),
+              child: _getCategoryIcon(category.id, isSelected),
             ),
             const SizedBox(height: 8),
             Text(
@@ -105,20 +102,48 @@ class _CategoryCard extends StatelessWidget {
   }
 
   /// Get appropriate icon for each category
-  IconData _getCategoryIcon(String categoryId) {
+  Widget _getCategoryIcon(String categoryId, bool isSelected) {
+    final Color iconColor = isSelected ? AppColors.background : AppColors.black;
+    const double iconSize = 20;
+
     switch (categoryId) {
       case 'dumped_rubbish':
-        return Icons.delete_outline;
+        return SvgPicture.asset(
+          'assets/svgs/bin.svg',
+          width: iconSize,
+          height: iconSize,
+          colorFilter: ColorFilter.mode(iconColor, BlendMode.srcIn),
+        );
       case 'graffiti_vandalism':
-        return Icons.brush_outlined;
+        return SvgPicture.asset(
+          'assets/svgs/vandalism.svg',
+          width: iconSize,
+          height: iconSize,
+          colorFilter: ColorFilter.mode(iconColor, BlendMode.srcIn),
+        );
       case 'pedestrian_hazard':
-        return Icons.directions_walk_outlined;
+        return SvgPicture.asset(
+          'assets/svgs/pedestrian.svg',
+          width: iconSize,
+          height: iconSize,
+          colorFilter: ColorFilter.mode(iconColor, BlendMode.srcIn),
+        );
       case 'traffic_hazard':
-        return Icons.traffic_outlined;
+        return SvgPicture.asset(
+          'assets/svgs/traffic.svg',
+          width: iconSize,
+          height: iconSize,
+          colorFilter: ColorFilter.mode(iconColor, BlendMode.srcIn),
+        );
       case 'other':
-        return Icons.more_horiz;
+        return SvgPicture.asset(
+          'assets/svgs/others.svg',
+          width: iconSize,
+          height: iconSize,
+          colorFilter: ColorFilter.mode(iconColor, BlendMode.srcIn),
+        );
       default:
-        return Icons.report_outlined;
+        return Icon(Icons.report_outlined, color: iconColor, size: iconSize);
     }
   }
 }

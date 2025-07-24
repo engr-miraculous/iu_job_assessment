@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:iu_job_assessment/models/location_model.dart';
 import 'package:iu_job_assessment/providers/location_picker_provider.dart';
-import 'package:iu_job_assessment/screens/location_picker_screen.dart/location_error_widget.dart';
+import 'package:iu_job_assessment/screens/location_picker/location_error_widget.dart';
 import 'package:iu_job_assessment/utils/app_colors.dart';
 
 /// Full-screen location picker with type-ahead address and map search functionality
@@ -63,7 +63,7 @@ class _LocationPickerScreenState extends ConsumerState<LocationPickerScreen> {
     _updateMarkers();
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.background,
       body: Consumer(
         builder: (context, ref, child) {
           final state = ref.watch(locationPickerProvider);
@@ -95,7 +95,7 @@ class _LocationPickerScreenState extends ConsumerState<LocationPickerScreen> {
               // Loading overlay
               if (state.isLoading)
                 Container(
-                  color: Colors.black.withAlpha(25),
+                  color: AppColors.black.withAlpha(25),
                   child: const Center(
                     child: CircularProgressIndicator(color: AppColors.primary),
                   ),
@@ -130,7 +130,7 @@ class _LocationPickerScreenState extends ConsumerState<LocationPickerScreen> {
             );
           }
         },
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.background,
         child: Icon(Icons.my_location, color: AppColors.primary),
       ),
     );
@@ -164,7 +164,7 @@ class _LocationPickerScreenState extends ConsumerState<LocationPickerScreen> {
           },
           markers: _markers,
           myLocationEnabled: true,
-          myLocationButtonEnabled: false, // We'll add custom button
+          myLocationButtonEnabled: false, // I'll add custom button
           mapType: MapType.normal,
           compassEnabled: true,
           tiltGesturesEnabled: false,
@@ -226,10 +226,10 @@ class _LocationPickerScreenState extends ConsumerState<LocationPickerScreen> {
       right: 0,
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.background,
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withAlpha(25),
+              color: AppColors.black.withAlpha(25),
               blurRadius: 10,
               offset: const Offset(0, 2),
             ),
@@ -250,7 +250,7 @@ class _LocationPickerScreenState extends ConsumerState<LocationPickerScreen> {
                         color: AppColors.textPrimary,
                       ),
                       style: IconButton.styleFrom(
-                        backgroundColor: Colors.grey.shade100,
+                        backgroundColor: AppColors.surface,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
@@ -264,7 +264,7 @@ class _LocationPickerScreenState extends ConsumerState<LocationPickerScreen> {
                         decoration: InputDecoration(
                           hintText: 'Search for a location...',
                           hintStyle: TextStyle(
-                            color: Colors.grey.shade500,
+                            color: AppColors.textSecondary,
                             fontSize: 16,
                           ),
                           prefixIcon: const Icon(
@@ -287,11 +287,15 @@ class _LocationPickerScreenState extends ConsumerState<LocationPickerScreen> {
                               : null,
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide(color: Colors.grey.shade300),
+                            borderSide: BorderSide(
+                              color: AppColors.textSecondary,
+                            ),
                           ),
                           enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide(color: Colors.grey.shade300),
+                            borderSide: BorderSide(
+                              color: AppColors.textSecondary,
+                            ),
                           ),
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
@@ -301,7 +305,7 @@ class _LocationPickerScreenState extends ConsumerState<LocationPickerScreen> {
                             ),
                           ),
                           filled: true,
-                          fillColor: Colors.white,
+                          fillColor: AppColors.background,
                           contentPadding: const EdgeInsets.symmetric(
                             horizontal: 16,
                             vertical: 12,
@@ -325,16 +329,14 @@ class _LocationPickerScreenState extends ConsumerState<LocationPickerScreen> {
                   return Container(
                     constraints: const BoxConstraints(maxHeight: 300),
                     decoration: BoxDecoration(
-                      color: Colors.white,
-                      border: Border(
-                        top: BorderSide(color: Colors.grey.shade200),
-                      ),
+                      color: AppColors.background,
+                      border: Border(top: BorderSide(color: AppColors.surface)),
                     ),
                     child: ListView.separated(
                       shrinkWrap: true,
                       itemCount: state.searchSuggestions.length,
                       separatorBuilder: (context, index) =>
-                          Divider(height: 1, color: Colors.grey.shade200),
+                          Divider(height: 1, color: AppColors.surface),
                       itemBuilder: (context, index) {
                         final suggestion = state.searchSuggestions[index];
                         return ListTile(
@@ -353,7 +355,7 @@ class _LocationPickerScreenState extends ConsumerState<LocationPickerScreen> {
                               ? Text(
                                   suggestion.secondaryText!,
                                   style: TextStyle(
-                                    color: Colors.grey.shade600,
+                                    color: AppColors.textSecondary,
                                     fontSize: 14,
                                   ),
                                 )
@@ -392,11 +394,11 @@ class _LocationPickerScreenState extends ConsumerState<LocationPickerScreen> {
             return Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppColors.background,
                 borderRadius: BorderRadius.circular(12),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withAlpha(25),
+                    color: AppColors.black.withAlpha(25),
                     blurRadius: 10,
                     offset: const Offset(0, 4),
                   ),
@@ -413,11 +415,11 @@ class _LocationPickerScreenState extends ConsumerState<LocationPickerScreen> {
           return Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: AppColors.background,
               borderRadius: BorderRadius.circular(12),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withAlpha(25),
+                  color: AppColors.black.withAlpha(25),
                   blurRadius: 10,
                   offset: const Offset(0, 4),
                 ),
@@ -458,7 +460,7 @@ class _LocationPickerScreenState extends ConsumerState<LocationPickerScreen> {
                       state.selectedLocation!.shortAddress,
                       style: TextStyle(
                         fontSize: 14,
-                        color: Colors.grey.shade600,
+                        color: AppColors.textSecondary,
                       ),
                     ),
                   ),
@@ -487,7 +489,7 @@ class _LocationPickerScreenState extends ConsumerState<LocationPickerScreen> {
                 : null,
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.primary,
-              disabledBackgroundColor: Colors.grey.shade300,
+              disabledBackgroundColor: AppColors.textSecondary,
               padding: const EdgeInsets.symmetric(vertical: 16),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
@@ -503,16 +505,18 @@ class _LocationPickerScreenState extends ConsumerState<LocationPickerScreen> {
                     height: 20,
                     child: CircularProgressIndicator(
                       strokeWidth: 2,
-                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        AppColors.background,
+                      ),
                     ),
                   )
                 else
-                  const Icon(Icons.check, color: Colors.white),
+                  const Icon(Icons.check, color: AppColors.background),
                 const SizedBox(width: 8),
                 Text(
                   state.isLoading ? 'Loading...' : 'Confirm Location',
                   style: const TextStyle(
-                    color: Colors.white,
+                    color: AppColors.background,
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
                   ),
