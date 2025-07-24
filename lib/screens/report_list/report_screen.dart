@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:iu_job_assessment/providers/report_provider.dart';
+import 'package:iu_job_assessment/screens/report_form/add_report_screen.dart';
 import 'package:iu_job_assessment/screens/report_list/report_item_widget.dart';
 import 'package:iu_job_assessment/utils/app_colors.dart';
 
@@ -311,7 +312,7 @@ class _ReportScreenState extends ConsumerState<ReportScreen> {
             ),
             backgroundColor: AppColors.primary,
           ),
-          onPressed: _showAddReportDialog,
+          onPressed: () => _showAddReportScreen(context),
           icon: const Icon(Icons.add_circle, color: AppColors.background),
           label: const Text(
             'Add Report',
@@ -325,117 +326,13 @@ class _ReportScreenState extends ConsumerState<ReportScreen> {
     );
   }
 
-  /// Show add report dialog
-  void _showAddReportDialog() {
-    showDialog(
-      context: context,
-      builder: (context) => _AddReportDialog(
-        onAdd: (type, location) {
-          ref
-              .read(reportsProvider.notifier)
-              .addReport(type: type, location: location);
-        },
+  /// Updated method to push AddReportScreen
+  static void _showAddReportScreen(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => const AddReportScreen(),
+        fullscreenDialog: true, // Makes it slide up from bottom
       ),
     );
-  }
-}
-
-/// Dialog for adding new reports
-class _AddReportDialog extends StatefulWidget {
-  final Function(String type, String location) onAdd;
-
-  const _AddReportDialog({required this.onAdd});
-
-  @override
-  State<_AddReportDialog> createState() => _AddReportDialogState();
-}
-
-// Temporary class for adding new reports
-class _AddReportDialogState extends State<_AddReportDialog> {
-  final _formKey = GlobalKey<FormState>();
-  final _typeController = TextEditingController();
-  final _locationController = TextEditingController();
-
-  @override
-  void dispose() {
-    _typeController.dispose();
-    _locationController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return AlertDialog(
-      title: const Text('Add New Report'),
-      content: Form(
-        key: _formKey,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextFormField(
-              controller: _typeController,
-              decoration: const InputDecoration(
-                labelText: 'Report Type',
-                hintText: 'e.g., Incident Report',
-                border: OutlineInputBorder(),
-              ),
-              validator: (value) {
-                if (value == null || value.trim().isEmpty) {
-                  return 'Please enter a report type';
-                }
-                return null;
-              },
-            ),
-            const SizedBox(height: 16),
-            TextFormField(
-              controller: _locationController,
-              decoration: const InputDecoration(
-                labelText: 'Location',
-                hintText: 'e.g., Building A - Floor 1',
-                border: OutlineInputBorder(),
-              ),
-              validator: (value) {
-                if (value == null || value.trim().isEmpty) {
-                  return 'Please enter a location';
-                }
-                return null;
-              },
-            ),
-          ],
-        ),
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Cancel'),
-        ),
-        ElevatedButton(
-          onPressed: _handleSubmit,
-          style: ElevatedButton.styleFrom(
-            backgroundColor: AppColors.primary,
-            foregroundColor: Colors.white,
-          ),
-          child: const Text('Add Report'),
-        ),
-      ],
-    );
-  }
-
-  void _handleSubmit() {
-    if (_formKey.currentState?.validate() ?? false) {
-      widget.onAdd(
-        _typeController.text.trim(),
-        _locationController.text.trim(),
-      );
-      Navigator.of(context).pop();
-
-      // Show success message
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Report added successfully'),
-          backgroundColor: AppColors.primary,
-        ),
-      );
-    }
   }
 }

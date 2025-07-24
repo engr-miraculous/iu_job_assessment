@@ -106,7 +106,7 @@ class ReportItemWidget extends StatelessWidget {
       case 'pending':
       default:
         statusColor = AppColors.error;
-        backgroundColor = AppColors.error.withOpacity(0.1);
+        backgroundColor = AppColors.error.withAlpha(25);
         break;
     }
 

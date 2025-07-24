@@ -121,3 +121,126 @@ class ReportsState {
     return 'ReportsState(reports: ${reports.length}, isLoading: $isLoading, hasMore: $hasMore, currentPage: $currentPage)';
   }
 }
+
+/// Model classes for report Categories
+class ReportCategory {
+  final String id;
+  final String name;
+  final String iconPath;
+  final bool requiresDescription;
+
+  const ReportCategory({
+    required this.id,
+    required this.name,
+    required this.iconPath,
+    this.requiresDescription = false,
+  });
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ReportCategory &&
+          runtimeType == other.runtimeType &&
+          id == other.id;
+
+  @override
+  int get hashCode => id.hashCode;
+}
+
+/// Available report categories
+class ReportCategories {
+  static const List<ReportCategory> categories = [
+    ReportCategory(
+      id: 'dumped_rubbish',
+      name: 'Dumped\nRubbish',
+      iconPath: 'assets/icons/dumped_rubbish.png',
+    ),
+    ReportCategory(
+      id: 'graffiti_vandalism',
+      name: 'Graffiti or\nVandalism',
+      iconPath: 'assets/icons/graffiti.png',
+    ),
+    ReportCategory(
+      id: 'pedestrian_hazard',
+      name: 'Pedestrian\nHazard',
+      iconPath: 'assets/icons/pedestrian.png',
+    ),
+    ReportCategory(
+      id: 'traffic_hazard',
+      name: 'Traffic\nHazard',
+      iconPath: 'assets/icons/traffic.png',
+    ),
+    ReportCategory(
+      id: 'other',
+      name: 'Other',
+      iconPath: 'assets/icons/other.png',
+      requiresDescription: true,
+    ),
+  ];
+
+  static ReportCategory? findById(String id) {
+    try {
+      return categories.firstWhere((category) => category.id == id);
+    } catch (e) {
+      return null;
+    }
+  }
+}
+
+/// Report form data model
+class ReportFormData {
+  final ReportCategory? category;
+  final String location;
+  final String description;
+  final List<String> photos;
+
+  const ReportFormData({
+    this.category,
+    this.location = '',
+    this.description = '',
+    this.photos = const [],
+  });
+
+  ReportFormData copyWith({
+    ReportCategory? category,
+    String? location,
+    String? description,
+    List<String>? photos,
+  }) {
+    return ReportFormData(
+      category: category ?? this.category,
+      location: location ?? this.location,
+      description: description ?? this.description,
+      photos: photos ?? this.photos,
+    );
+  }
+
+  /// Check if the form is valid for submission
+  bool get isValid {
+    if (category == null ||
+        location.trim().isEmpty ||
+        description.trim().isEmpty) {
+      return false;
+    }
+
+    // If "Other" category is selected, ensure description provides details
+    if (category!.requiresDescription && description.trim().length < 10) {
+      return false;
+    }
+
+    return true;
+  }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ReportFormData &&
+          runtimeType == other.runtimeType &&
+          category == other.category &&
+          location == other.location &&
+          description == other.description &&
+          photos.length == other.photos.length;
+
+  @override
+  int get hashCode => Object.hash(category, location, description, photos);
+}
