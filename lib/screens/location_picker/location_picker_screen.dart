@@ -140,9 +140,9 @@ class _LocationPickerScreenState extends ConsumerState<LocationPickerScreen> {
   Widget _buildMapArea() {
     return Consumer(
       builder: (context, ref, child) {
-        // Default camera position (Ibadan, Nigeria)
+        // Default camera position (The Sultan’s Palace)
         const CameraPosition initialPosition = CameraPosition(
-          target: LatLng(7.3775, 3.9470),
+          target: LatLng(13.06696, 5.24819),
           zoom: 14.0,
         );
 

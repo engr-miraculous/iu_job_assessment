@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:iu_job_assessment/providers/report_provider.dart';
+import 'package:iu_job_assessment/screens/report_details/report_details_screen.dart';
 import 'package:iu_job_assessment/screens/report_form/add_report_screen.dart';
 import 'package:iu_job_assessment/screens/report_list/report_item_widget.dart';
 import 'package:iu_job_assessment/utils/app_colors.dart';
@@ -154,11 +155,11 @@ class _ReportScreenState extends ConsumerState<ReportScreen> {
       report: report,
       isUserCreated: userCreated,
       onTap: () {
-        // TODO: Navigate to report details
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Tapped on ${report.type}'),
-            duration: const Duration(seconds: 1),
+        // Navigate to report details
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ReportDetailsScreen(report: report),
           ),
         );
       },
