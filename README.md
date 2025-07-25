@@ -37,7 +37,7 @@ This is a take-home technical assessment for the Flutter Developer position at *
 - **Tested on Android only:** The project was only tested on Android, but it should work on iOS with minimal configuration since no platform-specific code or library was used.
 - **Location Permissions:** The app will prompt for location permission the first time it is needed. If location services are turned off on the device, location and coordinates-related features may not work as expected, so in addition to granting permission, you will need to enable location services on the device.
 - **Google Maps API Key Required:** The project requires a Google Maps API key. The current key in the repository may be revoked at any time. Please obtain your own API key and update it in both the manifest file and the location service as shown below:
-  - In `android/app/src/main/AndroidManifest.xml`:
+  - In [AndroidManifest.xml](android/app/src/main/AndroidManifest.xml):
     ```xml
     <meta-data android:name="com.google.android.geo.API_KEY" android:value="<KEY>"/>
     ```
