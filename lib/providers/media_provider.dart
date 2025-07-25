@@ -97,9 +97,9 @@ class MediaNotifier extends StateNotifier<MediaState> {
       // Get current location
       String? coordinates;
       try {
-        final position = await _locationService.getCurrentPosition();
+        final positionData = await _locationService.getCurrentLocation();
         coordinates =
-            '${position.latitude.toStringAsFixed(6)}, ${position.longitude.toStringAsFixed(6)}';
+            '${positionData?.latitude.toStringAsFixed(6)}, ${positionData?.longitude.toStringAsFixed(6)}';
       } catch (e) {
         debugPrint('Could not get location: $e');
       }

@@ -1,144 +1,207 @@
+// widgets/report_item_widget.dart (Enhanced version)
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:iu_job_assessment/models/report_model.dart';
 import 'package:iu_job_assessment/utils/app_colors.dart';
+import 'package:iu_job_assessment/services/report_service.dart';
 
-/// Individual report item widget
 class ReportItemWidget extends StatelessWidget {
   final Report report;
+  final bool? isUserCreated;
   final VoidCallback? onTap;
+  final VoidCallback? onDelete;
 
-  const ReportItemWidget({super.key, required this.report, this.onTap});
+  const ReportItemWidget({
+    super.key,
+    required this.report,
+    this.isUserCreated,
+    this.onTap,
+    this.onDelete,
+  });
 
   @override
   Widget build(BuildContext context) {
+    final bool userCreated =
+        isUserCreated ?? ReportService.isUserCreatedReportSync(report.id);
+
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(8),
-        side: BorderSide(color: Colors.grey.shade200, width: 1),
-      ),
-      child: InkWell(
+      elevation: userCreated ? 3 : 1,
+      child: ListTile(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(8),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildHeader(),
-              const SizedBox(height: 4),
-              _buildLocation(),
-            ],
+        title: Text(
+          report.type,
+          style: TextStyle(
+            fontWeight: userCreated ? FontWeight.bold : FontWeight.w600,
+            fontSize: 16,
+            color: userCreated ? AppColors.primary : AppColors.textPrimary,
           ),
+        ),
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              report.location,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                color: userCreated
+                    ? AppColors.textPrimary
+                    : AppColors.textSecondary,
+              ),
+            ),
+            const SizedBox(height: 4),
+            if (report.description.isNotEmpty) ...[
+              Text(
+                report.description,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+              ),
+              const SizedBox(height: 4),
+            ],
+            Row(
+              children: [
+                _buildStatusChip(),
+                const SizedBox(width: 8),
+                if (userCreated) _buildUserCreatedBadge(),
+              ],
+            ),
+          ],
+        ),
+        trailing: _buildTrailing(context, userCreated),
+        isThreeLine: true,
+      ),
+    );
+  }
+
+  Widget _buildStatusChip() {
+    Color statusColor;
+    switch (report.status.toLowerCase()) {
+      case 'completed':
+        statusColor = Colors.green;
+        break;
+      case 'pending':
+        statusColor = Colors.orange;
+        break;
+      case 'rejected':
+        statusColor = Colors.red;
+        break;
+      case 'verified':
+        statusColor = Colors.blue;
+        break;
+      case 'submitted':
+        statusColor = Colors.purple;
+        break;
+      default:
+        statusColor = Colors.grey;
+    }
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+      decoration: BoxDecoration(
+        color: statusColor.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: statusColor.withOpacity(0.5)),
+      ),
+      child: Text(
+        report.status,
+        style: TextStyle(
+          color: statusColor,
+          fontSize: 12,
+          fontWeight: FontWeight.bold,
         ),
       ),
     );
   }
 
-  /// Build the header row with report type and status
-  Widget _buildHeader() {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
+  Widget _buildUserCreatedBadge() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      decoration: BoxDecoration(
+        color: AppColors.primary.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: AppColors.primary.withOpacity(0.5)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.save_outlined, size: 10, color: AppColors.primary),
+          const SizedBox(width: 2),
+          const Text(
+            'SAVED',
+            style: TextStyle(
+              color: AppColors.primary,
+              fontSize: 10,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTrailing(BuildContext context, bool userCreated) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.end,
       children: [
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                report.type,
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                  color: AppColors.textPrimary,
-                ),
-              ),
-              const SizedBox(height: 2),
-              Text(
-                _formatDate(report.createdAt),
-                style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
-              ),
-            ],
+        Text(
+          report.referenceNumber,
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 12,
+            color: userCreated ? AppColors.primary : AppColors.textPrimary,
           ),
         ),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            Text(
-              _formatDateTime(report.createdAt),
-              style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
-            ),
-            const SizedBox(height: 4),
-            _buildStatusChip(),
-          ],
+        const SizedBox(height: 4),
+        Text(
+          _formatDate(report.createdAt),
+          style: TextStyle(color: Colors.grey.shade600, fontSize: 11),
         ),
+        if (userCreated && onDelete != null) ...[
+          const SizedBox(height: 4),
+          GestureDetector(
+            onTap: onDelete,
+            child: Container(
+              padding: const EdgeInsets.all(2),
+              decoration: BoxDecoration(
+                color: Colors.red.shade50,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(
+                Icons.delete_outline,
+                size: 16,
+                color: Colors.red.shade400,
+              ),
+            ),
+          ),
+        ],
       ],
     );
   }
 
-  /// Build location text
-  Widget _buildLocation() {
-    return Text(
-      report.location,
-      style: TextStyle(fontSize: 14, color: Colors.grey.shade700),
-    );
-  }
+  String _formatDate(DateTime date) {
+    final now = DateTime.now();
+    final difference = now.difference(date);
 
-  /// Build status chip with appropriate color
-  Widget _buildStatusChip() {
-    Color statusColor;
-    Color backgroundColor;
-
-    switch (report.status.toLowerCase()) {
-      case 'completed':
-        statusColor = Colors.green.shade700;
-        backgroundColor = Colors.green.shade50;
-        break;
-      case 'in progress':
-        statusColor = Colors.orange.shade700;
-        backgroundColor = Colors.orange.shade50;
-        break;
-      case 'cancelled':
-        statusColor = Colors.grey.shade700;
-        backgroundColor = Colors.grey.shade100;
-        break;
-      case 'pending':
-      default:
-        statusColor = AppColors.error;
-        backgroundColor = AppColors.error.withAlpha(25);
-        break;
+    if (difference.inDays == 0) {
+      if (difference.inHours == 0) {
+        return '${difference.inMinutes}m ago';
+      }
+      return '${difference.inHours}h ago';
+    } else if (difference.inDays == 1) {
+      return 'Yesterday';
+    } else if (difference.inDays < 7) {
+      return '${difference.inDays} days ago';
+    } else if (difference.inDays < 30) {
+      final weeks = (difference.inDays / 7).floor();
+      return '${weeks}w ago';
+    } else {
+      return '${date.day}/${date.month}/${date.year}';
     }
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: backgroundColor,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Text(
-        '(Status ${report.referenceNumber})',
-        style: TextStyle(
-          fontSize: 12,
-          color: statusColor,
-          fontWeight: FontWeight.w500,
-        ),
-      ),
-    );
-  }
-
-  /// Format date for display (e.g., "Dec 15, 2024")
-  String _formatDate(DateTime dateTime) {
-    return DateFormat('MMM dd, yyyy').format(dateTime);
-  }
-
-  /// Format time for display (e.g., "2:30 PM")
-  String _formatDateTime(DateTime dateTime) {
-    return DateFormat('h:mm a').format(dateTime);
   }
 }
 
-/// Loading item widget for pagination
+/// Loading placeholder widget for report items
 class LoadingReportItemWidget extends StatelessWidget {
   const LoadingReportItemWidget({super.key});
 
@@ -146,54 +209,58 @@ class LoadingReportItemWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(8),
-        side: BorderSide(color: Colors.grey.shade200, width: 1),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
+      child: ListTile(
+        leading: CircleAvatar(
+          backgroundColor: Colors.grey.shade300,
+          child: const SizedBox(
+            width: 20,
+            height: 20,
+            child: CircularProgressIndicator(
+              strokeWidth: 2,
+              valueColor: AlwaysStoppedAnimation<Color>(Colors.grey),
+            ),
+          ),
+        ),
+        title: Container(
+          height: 16,
+          width: double.infinity,
+          decoration: BoxDecoration(
+            color: Colors.grey.shade300,
+            borderRadius: BorderRadius.circular(4),
+          ),
+        ),
+        subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _buildShimmer(width: 150, height: 16),
-                      const SizedBox(height: 4),
-                      _buildShimmer(width: 80, height: 12),
-                    ],
-                  ),
-                ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    _buildShimmer(width: 60, height: 12),
-                    const SizedBox(height: 4),
-                    _buildShimmer(width: 90, height: 20),
-                  ],
-                ),
-              ],
+            const SizedBox(height: 8),
+            Container(
+              height: 12,
+              width: 150,
+              decoration: BoxDecoration(
+                color: Colors.grey.shade300,
+                borderRadius: BorderRadius.circular(4),
+              ),
             ),
             const SizedBox(height: 8),
-            _buildShimmer(width: 200, height: 14),
+            Container(
+              height: 20,
+              width: 80,
+              decoration: BoxDecoration(
+                color: Colors.grey.shade300,
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
           ],
         ),
-      ),
-    );
-  }
-
-  /// Build shimmer placeholder
-  Widget _buildShimmer({required double width, required double height}) {
-    return Container(
-      width: width,
-      height: height,
-      decoration: BoxDecoration(
-        color: Colors.grey.shade300,
-        borderRadius: BorderRadius.circular(4),
+        trailing: Container(
+          height: 40,
+          width: 60,
+          decoration: BoxDecoration(
+            color: Colors.grey.shade300,
+            borderRadius: BorderRadius.circular(4),
+          ),
+        ),
+        isThreeLine: true,
       ),
     );
   }

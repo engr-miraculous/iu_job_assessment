@@ -1,9 +1,10 @@
+// models/report_model.dart
 import 'package:iu_job_assessment/models/media_models.dart';
 
 /// Data model for Report entity
 class Report {
   final String id;
-  final String type;
+  final String type; // equivalent to ReportCategory
   final String location;
   final String status;
   final String referenceNumber;
@@ -36,7 +37,7 @@ class Report {
               ?.map((e) => MediaItem.fromJson(e as Map<String, dynamic>))
               .toList() ??
           [],
-      description: json['description'] as String,
+      description: json['description'] as String? ?? '',
       createdAt: DateTime.parse(json['createdAt'] as String),
     );
   }
@@ -93,13 +94,15 @@ class Report {
   }
 }
 
-/// State class for paginated reports
+/// State class for paginated reports with persistence support
 class ReportsState {
   final List<Report> reports;
   final bool isLoading;
   final bool hasMore;
   final String? error;
   final int currentPage;
+  final int totalReports; // Total count including persisted and mock
+  final int persistedCount; // Count of persisted user reports
 
   const ReportsState({
     required this.reports,
@@ -107,6 +110,8 @@ class ReportsState {
     required this.hasMore,
     this.error,
     required this.currentPage,
+    required this.totalReports,
+    required this.persistedCount,
   });
 
   /// Initial state
@@ -115,28 +120,34 @@ class ReportsState {
       isLoading = false,
       hasMore = true,
       error = null,
-      currentPage = 0;
+      currentPage = 0,
+      totalReports = 123, // Default mock total
+      persistedCount = 0;
 
-  /// Loading state
+  /// Create copy with updated fields
   ReportsState copyWith({
     List<Report>? reports,
     bool? isLoading,
     bool? hasMore,
     String? error,
     int? currentPage,
+    int? totalReports,
+    int? persistedCount,
   }) {
     return ReportsState(
       reports: reports ?? this.reports,
       isLoading: isLoading ?? this.isLoading,
       hasMore: hasMore ?? this.hasMore,
-      error: error ?? this.error,
+      error: error,
       currentPage: currentPage ?? this.currentPage,
+      totalReports: totalReports ?? this.totalReports,
+      persistedCount: persistedCount ?? this.persistedCount,
     );
   }
 
   @override
   String toString() {
-    return 'ReportsState(reports: ${reports.length}, isLoading: $isLoading, hasMore: $hasMore, currentPage: $currentPage)';
+    return 'ReportsState(reports: ${reports.length}, isLoading: $isLoading, hasMore: $hasMore, currentPage: $currentPage, totalReports: $totalReports, persistedCount: $persistedCount)';
   }
 }
 

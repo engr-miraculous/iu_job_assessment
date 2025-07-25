@@ -2,10 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:iu_job_assessment/screens/report_list/report_screen.dart';
 import 'package:iu_job_assessment/screens/splash_screen.dart';
+import 'package:iu_job_assessment/services/database_service.dart';
 import 'package:iu_job_assessment/utils/app_colors.dart';
 import 'package:iu_job_assessment/widgets/bottom_nav.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize database before running the app
+  await DatabaseService.initialize();
+
   runApp(const ProviderScope(child: MyApp()));
 }
 

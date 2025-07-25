@@ -1,3 +1,4 @@
+// screens/report_list/report_screen.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
@@ -5,6 +6,7 @@ import 'package:iu_job_assessment/providers/report_provider.dart';
 import 'package:iu_job_assessment/screens/report_form/add_report_screen.dart';
 import 'package:iu_job_assessment/screens/report_list/report_item_widget.dart';
 import 'package:iu_job_assessment/utils/app_colors.dart';
+import 'package:iu_job_assessment/services/report_service.dart';
 
 /// Main reports screen with list and pagination
 class ReportScreen extends ConsumerStatefulWidget {
@@ -46,11 +48,7 @@ class _ReportScreenState extends ConsumerState<ReportScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: _buildAppBar(),
-      body: _buildBody(),
-      //floatingActionButton: _buildAddReportButton(),
-    );
+    return Scaffold(appBar: _buildAppBar(), body: _buildBody());
   }
 
   /// Build the app bar with location and search icons
@@ -72,6 +70,25 @@ class _ReportScreenState extends ConsumerState<ReportScreen> {
           },
           icon: const Icon(Icons.search, color: AppColors.textPrimary),
         ),
+        // Add a debug menu for development
+        PopupMenuButton<String>(
+          onSelected: (value) async {
+            switch (value) {
+              case 'clear_user_reports':
+                await ref.read(reportsProvider.notifier).clearAllUserReports();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('User reports cleared')),
+                );
+                break;
+            }
+          },
+          itemBuilder: (context) => [
+            const PopupMenuItem(
+              value: 'clear_user_reports',
+              child: Text('Clear User Reports'),
+            ),
+          ],
+        ),
       ],
     );
   }
@@ -80,6 +97,7 @@ class _ReportScreenState extends ConsumerState<ReportScreen> {
   Widget _buildBody() {
     final reportsState = ref.watch(reportsProvider);
     final totalReports = ref.watch(totalReportsProvider);
+    final loadedReports = ref.watch(loadedReportsProvider);
     final isEmpty = ref.watch(isReportsEmptyProvider);
 
     if (isEmpty) {
@@ -103,7 +121,7 @@ class _ReportScreenState extends ConsumerState<ReportScreen> {
             ),
           ),
         ),
-        _buildBottomInfo(reportsState.reports.length, totalReports),
+        _buildBottomInfo(loadedReports, totalReports),
       ],
     );
   }
@@ -130,8 +148,11 @@ class _ReportScreenState extends ConsumerState<ReportScreen> {
     }
 
     final report = reportsState.reports[index];
+    final bool userCreated = ReportService.isUserCreatedReportSync(report.id);
+
     return ReportItemWidget(
       report: report,
+      isUserCreated: userCreated,
       onTap: () {
         // TODO: Navigate to report details
         ScaffoldMessenger.of(context).showSnackBar(
@@ -141,6 +162,34 @@ class _ReportScreenState extends ConsumerState<ReportScreen> {
           ),
         );
       },
+      onDelete: userCreated ? () => _showDeleteConfirmation(report.id) : null,
+    );
+  }
+
+  /// Show delete confirmation dialog
+  void _showDeleteConfirmation(String reportId) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Delete Report'),
+        content: const Text('Are you sure you want to delete this report?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () async {
+              Navigator.of(context).pop();
+              await ref.read(reportsProvider.notifier).deleteReport(reportId);
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(const SnackBar(content: Text('Report deleted')));
+            },
+            child: const Text('Delete', style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
     );
   }
 
