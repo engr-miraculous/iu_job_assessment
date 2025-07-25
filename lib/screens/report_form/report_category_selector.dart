@@ -91,7 +91,7 @@ class _CategoryCard extends StatelessWidget {
               style: TextStyle(
                 fontSize: 12,
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-                color: isSelected ? AppColors.primary : AppColors.textSecondary,
+                color: isSelected ? AppColors.primary : AppColors.textPrimary,
                 height: 1.2,
               ),
             ),

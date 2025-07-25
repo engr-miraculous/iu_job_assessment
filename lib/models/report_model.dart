@@ -7,6 +7,7 @@ class Report {
   final String location;
   final String status;
   final String referenceNumber;
+  final String description;
   final List<MediaItem> media;
   final DateTime createdAt;
 
@@ -17,6 +18,7 @@ class Report {
     required this.status,
     required this.referenceNumber,
     this.media = const [],
+    this.description = '',
     required this.createdAt,
   });
 
@@ -34,6 +36,7 @@ class Report {
               ?.map((e) => MediaItem.fromJson(e as Map<String, dynamic>))
               .toList() ??
           [],
+      description: json['description'] as String,
       createdAt: DateTime.parse(json['createdAt'] as String),
     );
   }
@@ -47,6 +50,7 @@ class Report {
       'status': status,
       'referenceNumber': referenceNumber,
       'media': media.map((e) => e.toJson()).toList(),
+      'description': description,
       'createdAt': createdAt.toIso8601String(),
     };
   }
@@ -59,6 +63,7 @@ class Report {
     String? status,
     String? referenceNumber,
     List<MediaItem>? media,
+    String? description,
     DateTime? createdAt,
   }) {
     return Report(
@@ -68,6 +73,7 @@ class Report {
       status: status ?? this.status,
       referenceNumber: referenceNumber ?? this.referenceNumber,
       media: media ?? this.media,
+      description: description ?? this.description,
       createdAt: createdAt ?? this.createdAt,
     );
   }
@@ -83,7 +89,7 @@ class Report {
 
   @override
   String toString() {
-    return 'Report(id: $id, type: $type, location: $location, status: $status)';
+    return 'Report(id: $id, type: $type, location: $location, status: $status, description: $description, createdAt: $createdAt)';
   }
 }
 

@@ -59,6 +59,7 @@ class ReportFormProvider extends StateNotifier<ReportFormData> {
       referenceNumber: 'REF${DateTime.now().millisecondsSinceEpoch}',
       createdAt: DateTime.now(),
       media: state.media,
+      description: state.description,
     );
 
     // Add to in-memory reports list
@@ -69,7 +70,7 @@ class ReportFormProvider extends StateNotifier<ReportFormData> {
   }
 }
 
-/// Provider for the report form controller
+/// Provider for the report form Provider
 final reportFormProvider =
     StateNotifierProvider<ReportFormProvider, ReportFormData>(
       (ref) => ReportFormProvider(),

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:iu_job_assessment/main.dart';
+import 'package:iu_job_assessment/screens/login_screen.dart';
 import 'package:iu_job_assessment/utils/app_colors.dart';
 
 class SplashScreen extends StatelessWidget {
@@ -62,7 +62,7 @@ class SplashScreen extends StatelessWidget {
                       // Navigate to main app
                       Navigator.of(context).pushReplacement(
                         MaterialPageRoute(
-                          builder: (context) => const MainScreen(),
+                          builder: (context) => const LoginScreen(),
                         ),
                       );
                     },
@@ -89,7 +89,7 @@ class SplashScreen extends StatelessWidget {
                       // Navigate to Main for now and replace the splash screen
                       Navigator.of(context).pushReplacement(
                         MaterialPageRoute(
-                          builder: (context) => const MainScreen(),
+                          builder: (context) => const LoginScreen(),
                         ),
                       );
                     },
