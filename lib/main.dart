@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:iu_job_assessment/screens/account_screen.dart';
+import 'package:iu_job_assessment/screens/dashboard_screen.dart';
 import 'package:iu_job_assessment/screens/report_list/report_screen.dart';
+import 'package:iu_job_assessment/screens/report_map_screen.dart';
 import 'package:iu_job_assessment/screens/splash_screen.dart';
 import 'package:iu_job_assessment/services/database_service.dart';
 import 'package:iu_job_assessment/utils/app_colors.dart';
@@ -88,43 +92,6 @@ class _MainScreenState extends ConsumerState<MainScreen> {
         currentIndex: _currentIndex,
         onTap: (index) => setState(() => _currentIndex = index),
       ),
-    );
-  }
-}
-
-/// Placeholder screens for other tabs
-class DashboardScreen extends StatelessWidget {
-  const DashboardScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text('Dashboard')),
-      body: Center(child: Text('Dashboard Screen')),
-    );
-  }
-}
-
-class ReportMapScreen extends StatelessWidget {
-  const ReportMapScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text('Report Map')),
-      body: Center(child: Text('Report Map Screen')),
-    );
-  }
-}
-
-class AccountScreen extends StatelessWidget {
-  const AccountScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text('Account')),
-      body: Center(child: Text('Account Screen')),
     );
   }
 }

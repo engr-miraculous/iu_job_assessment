@@ -13,6 +13,7 @@ class LocationService {
   const LocationService._internal();
 
   // This should not be on mobile, but somwhere on the server for security.
+  // Though the manifest file needs it too so only package based restriction can help.
   static const String _googlePlacesApiKey =
       'AIzaSyD7emBLlRin5F7q3iRZ4mCrIBd25uhv8y8';
   static const String _placesBaseUrl =
